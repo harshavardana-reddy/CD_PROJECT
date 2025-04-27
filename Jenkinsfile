@@ -62,8 +62,8 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sshagent(['EC2-SSH-KEY']) {
-                    bat "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
-                    bat "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
+                    sh "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
+                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
                 }
             }
         }
