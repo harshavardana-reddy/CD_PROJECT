@@ -61,6 +61,8 @@ pipeline {
         
         stage('Deploy Application') {
             steps {
+                echo "Deploying to EC2 instance at ${env.EC2_IP}"
+                echo "Using SSH key: ${env.SSH_KEY}"
                 sshagent(['EC2-SSH-KEY']) {
                     sh "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
                     sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
