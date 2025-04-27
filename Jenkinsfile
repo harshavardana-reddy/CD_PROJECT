@@ -34,14 +34,13 @@ pipeline {
                         bat 'terraform apply -auto-approve'
                         
                         // Get Terraform output
-                        def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
-                         tfOutput = tfOutput.replaceFirst(/^.*?\{/, '{')  // Remove command prompt prefix
-                        // Log the output to check it
-                        echo "Terraform Output: ${tfOutput}"
+                        bat 'terraform output -json > output.json'
+                        
                         
                         try {
                             // Parse the JSON output
-                            def outputs = readJSON(text: tfOutput)
+                            def outputs = readJSON file: 'output.json'
+                            echo "Terraform Outputs: ${outputs}"
                             env.EC2_IP = outputs.instance_public_ip.value
                         } catch (Exception e) {
                             error "Failed to parse Terraform output: ${e.getMessage()}"
