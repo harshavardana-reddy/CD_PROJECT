@@ -72,7 +72,11 @@ pipeline {
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
                     }
                     } catch (Exception e) {
-                        error "Failed to deploy application: ${e}"
+    
+                            echo "Exception occurred: ${e.toString()}"
+                            echo "Stack Trace: ${e.getStackTrace()}"
+                            error "Failed to deploy application."
+                        }
                     }
                 }
             }
