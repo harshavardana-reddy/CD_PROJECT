@@ -74,7 +74,7 @@ pipeline {
                             ssh -i cd_project.pem ec2-user@${env.EC2_IP} "dos2unix /home/ec2-user/deploy-app.sh"
                             ssh -i cd_project.pem ec2-user@${env.EC2_IP} "ls -l /home/ec2-user/deploy-app.sh"
                             ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh"
-                            ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "bash /home/ec2-user/deploy-app.sh"
+                            ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "EC2_IP=${env.EC2_IP} bash /home/ec2-user/deploy-app.sh"
                         """
 
                         
