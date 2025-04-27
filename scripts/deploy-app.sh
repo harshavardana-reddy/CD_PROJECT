@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clone repository
-REPO_URL="https://github.com/your-username/your-repo.git"
+REPO_URL="https://github.com/harshavardana-reddy/CD_PROJECT.git"
 TARGET_DIR="/home/ec2-user/app"
 
 if [ -d "$TARGET_DIR" ]; then

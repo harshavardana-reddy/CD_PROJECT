@@ -2,20 +2,20 @@ pipeline {
     agent any
     
     environment {
-        SSH_KEY              = credentials('ec2-ssh-key')
+        SSH_KEY = credentials('EC2-SSH-KEY')
     }
     
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/harshavardana-reddy/CD_PROJECT.git'
             }
         }
         
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    sh 'terraform init'
+                    bat 'terraform init'
                 }
             }
         }
@@ -23,7 +23,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    sh 'terraform apply -auto-approve'
+                    bat 'terraform apply -auto-approve'
                 }
             }
         }
@@ -42,8 +42,8 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 sshagent(['ec2-ssh-key']) {
-                    sh "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
-                    sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
+                    bat "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
+                    bat "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
                 }
             }
         }
