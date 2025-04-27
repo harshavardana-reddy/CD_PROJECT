@@ -65,7 +65,7 @@ pipeline {
                 script {
                     try {
                         // Define paths - using normalized Windows paths
-                        def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
+                        def sshKeyPath = 'C:\\Users\\patti\\.ssh\\cd_project.pem'
 
                         // Rest of your deployment steps...
                         bat """
