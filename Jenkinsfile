@@ -29,7 +29,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    bat 'terraform apply'
+                    bat 'terraform apply -auto-approve'
                 }
             }
         }
