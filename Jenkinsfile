@@ -8,6 +8,7 @@ pipeline {
         RAZORPAY_KEY_ID = credentials('RAZORPAY_KEY_ID')
         RAZORPAY_KEY_SECRET = credentials('RAZORPAY_KEY_SECRET')
         VITE_APP_RAZORPAY_KEY = credentials('VITE_APP_RAZORPAY_KEY')
+        aws_credential = credentials('AWS-TERRAFORM')
 
     }
     
