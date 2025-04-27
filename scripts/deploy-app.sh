@@ -19,11 +19,16 @@ if [ -z "$EC2_IP" ]; then
 fi
 
 # Update backendApi in backendURL.jsx
-sed -i "s|const backendApi = \"localhost\"|const backendApi = \"${EC2_IP}\"|g" $TARGET_DIR/frontendapp/src/backendURL.jsx
+sed -i "s|const backendApi = \"localhost\"|const backendApi = \"${EC2_IP}\"|g" $TARGET_DIR/frontendapp/src/BackendURL.jsx
 
 # Optionally, you can verify the replacement was successful
-echo "Updated backendApi in backendURL.jsx to: $EC2_IP"
-cat $TARGET_DIR/frontendapp/src/backendURL.jsx
+echo "Updated backendApi in BackendURL.jsx to: $EC2_IP"
+cat $TARGET_DIR/frontendapp/src/BackendURL.jsx
+
+NGINX_CONF_PATH= "$TARGET_DIR/frontendapp/nginx.conf"
+
+# Replace "proxy_pass http://backend:5000" with "proxy_pass http://<EC2_IP>:5000"
+sed -i "s|proxy_pass http://backend:5000|proxy_pass http://$EC2_IP:5000|g" $NGINX_CONF_PATH
 
 # Build and run containers
 docker-compose down
