@@ -66,18 +66,6 @@ pipeline {
                     try {
                         // Define paths - using normalized Windows paths
                         def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
-                        def normalizedPath = sshKeyPath.replace('\\', '\\\\')
-                        
-                        // Set permissions using icacls
-                        bat """
-                            icacls "${normalizedPath}" /reset
-                            icacls "${normalizedPath}" /inheritance:r
-                            icacls "${normalizedPath}" /grant:r "HARSHA\\patti:(R)"
-                            icacls "${normalizedPath}"
-                        """
-                        
-                        // Verify the permissions were set
-                        bat "icacls \"${normalizedPath}\""
 
                         // Rest of your deployment steps...
                         bat """
