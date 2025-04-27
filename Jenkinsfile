@@ -77,7 +77,7 @@ pipeline {
                     bat """
                         icacls "${normalizedPath}" /inheritance:r
                         icacls "${normalizedPath}" /remove "NT AUTHORITY\\Authenticated Users"
-                        icacls "${normalizedPath}" /grant:r "${jenkinsUser.trim()}:(R)"
+                        icacls "${normalizedPath}" /grant:r "patti:(R)"
                         icacls "${normalizedPath}" /remove "BUILTIN\\Users"
                     """
 
