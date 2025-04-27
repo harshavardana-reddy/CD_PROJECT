@@ -1,18 +1,6 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ./frontendapp
-    ports:
-      - "3000:80"
-    environment:
-      - VITE_APP_RAZORPAY_KEY=rzp_test_674mfXBBMLrDhq
-      - VITE_APP_BACKEND_URL=http://backend:5000
-    depends_on:
-      - backend
-    restart: unless-stopped
-
   backend:
     build:
       context: ./backendapp
@@ -24,4 +12,16 @@ services:
       - RAZORPAY_KEY_ID=rzp_test_674mfXBBMLrDhq
       - RAZORPAY_KEY_SECRET=BjvqhpI4cEhYatBnPrQ4gkbV
       - JWT_SECRET_KEY=455790ae4f2e3ce5b081f5227d64373d8b272161b52c918038679c1bb61dc658
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontendapp
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_APP_RAZORPAY_KEY=rzp_test_674mfXBBMLrDhq
+      - VITE_APP_BACKEND_URL=http://backend:5000
+    depends_on:
+      - backend
     restart: unless-stopped
