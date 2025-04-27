@@ -29,46 +29,32 @@ pipeline {
         
         stage('Terraform Apply') {
             steps {
-                dir('terraform') {
-                    bat 'terraform apply -auto-approve'
+                script {
+                    dir('terraform') {
+                        bat 'terraform apply -auto-approve'
+                        
+                        // Get Terraform output
+                        def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
+                        
+                        // Log the output to check it
+                        echo "Terraform Output: ${tfOutput}"
+                        
+                        try {
+                            // Parse the JSON output
+                            def outputs = readJSON(text: tfOutput)
+                            env.EC2_IP = outputs.instance_public_ip.value
+                        } catch (Exception e) {
+                            error "Failed to parse Terraform output: ${e.getMessage()}"
+                        }
+                    }
+                    echo "EC2 Instance IP: ${env.EC2_IP}"
                 }
             }
         }
         
-        stage('Wait for EC2 Instance to be Ready') {
-            steps {
-                script {
-                    echo "Waiting 30 seconds for EC2 instance to be created..."
-                    sleep(time: 30, unit: 'SECONDS')
-                }
-            }
-        }
-
-        stage('Get EC2 IP') {
-            steps {
-                script {
-                    // Directly run the terraform output command using bat
-                    def tfOutput = bat returnStdout: true, script: 'terraform output -json'
-
-                    // Log the output to check it
-                    echo "Terraform Output: ${tfOutput}"
-
-                    try {
-                        // Parse the JSON output
-                        def outputs = readJSON(text: tfOutput)
-                        env.EC2_IP = outputs.instance_public_ip.value
-                    } catch (Exception e) {
-                        error "Invalid JSON output: ${e.getMessage()}"
-                    }
-                }
-                echo "EC2 Instance IP: ${env.EC2_IP}"
-            }
-        }
-
-
         stage('Deploy Application') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                sshagent(['EC2-SSH-KEY']) {
                     bat "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
                     bat "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
                 }
@@ -81,7 +67,7 @@ pipeline {
             echo 'Pipeline completed'
         }
 
-        failure{
+        failure {
             dir('terraform') {
                 bat 'terraform destroy -auto-approve'
             }
