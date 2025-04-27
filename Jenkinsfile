@@ -59,70 +59,44 @@ pipeline {
             }
         }
         
-        stage('Deploy Application') {
-            steps {
-                echo "Deploying to EC2 instance at ${env.EC2_IP}"
-                script {
-                    try {
-                        // Define paths - using forward slashes works on both Windows and Unix-like systems
-                        def sshKeyPath = 'D:/KLU/3RD YEAR EVEN SEM/Cloud-Devops/Project/cd_project.pem'
-                        def deployScriptPath = './scripts/deploy-app.sh'
-                        def jenkinsUser = bat(script: 'echo %USERNAME%', returnStdout: true).trim()
-                        
-                        // Set proper permissions for the SSH key (Windows specific)
-                        if (isUnix()) {
-                            echo "Running on Unix-like system"
-                            sh "chmod 600 ${sshKeyPath}"
-                        } else {
-                            echo "Running on Windows system"
-                            bat """
-                                icacls "${sshKeyPath.replace('/', '\\')}" /inheritance:r
-                                icacls "${sshKeyPath.replace('/', '\\')}" /remove "NT AUTHORITY\\Authenticated Users"
-                                icacls "${sshKeyPath.replace('/', '\\')}" /grant:r "${jenkinsUser}:(R)"
-                                icacls "${sshKeyPath.replace('/', '\\')}" /remove "BUILTIN\\Users"
-                            """
-                        }
+       stage('Deploy Application') {
+        steps {
+            echo "Deploying to EC2 instance at ${env.EC2_IP}"
+            script {
+                try {
+                    // Define paths - using normalized Windows paths
+                    def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
+                    def normalizedPath = sshKeyPath.replace('\\', '\\\\')
+                    
+                    // Get the actual username of the account running Jenkins
+                    def jenkinsUser = bat(script: 'echo %USERNAME%', returnStdout: true).trim()
+                    
+                    echo "Setting permissions for SSH key using account: ${jenkinsUser}"
+                    
+                    // Set permissions using icacls
+                    bat """
+                        icacls "${normalizedPath}" /inheritance:r
+                        icacls "${normalizedPath}" /remove "NT AUTHORITY\\Authenticated Users"
+                        icacls "${normalizedPath}" /grant:r "${jenkinsUser.trim()}:(R)"
+                        icacls "${normalizedPath}" /remove "BUILTIN\\Users"
+                    """
 
-                        // Verify the deploy script exists
-                        if (!fileExists(deployScriptPath)) {
-                            error "Deploy script not found at ${deployScriptPath}"
-                        }
+                    // Verify the permissions were set
+                    bat "icacls \"${normalizedPath}\""
 
-                        // Copy deploy script to EC2 instance
-                        echo "Copying files to EC2 instance"
-                        
-                            if (isUnix()) {
-                                sh """
-                                    scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no ${deployScriptPath} ec2-user@${env.EC2_IP}:/home/ec2-user/
-                                """
-                            } else {
-                                bat """
-                                    scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no ${deployScriptPath} ec2-user@${env.EC2_IP}:/home/ec2-user/
-                                """
-                            }
+                    // Rest of your deployment steps...
+                    bat """
+                        scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
+                        ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
+                    """
 
-                        // Run deployment script on EC2 instance
-                        echo "Running deployment script on EC2 instance"
-                        if (isUnix()) {
-                            sh """
-                                ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} \
-                                    "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
-                            """
-                        } else {
-                            bat """
-                                ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} \
-                                    "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
-                            """
-                        }
-
-                    } catch (Exception e) {
-                        echo "Exception occurred: ${e.getMessage()}"
-                        currentBuild.result = 'FAILURE'
-                        error "Failed to deploy application. See logs for details."
-                    }
+                } catch (Exception e) {
+                    echo "Exception occurred: ${e.getMessage()}"
+                    error "Failed to deploy application. See logs for details."
                 }
             }
         }
+    }
 
     }
     
