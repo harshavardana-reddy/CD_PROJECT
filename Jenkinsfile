@@ -42,7 +42,7 @@ pipeline {
                     def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
                     
                     // Check if the output is valid JSON
-                    
+                    echo "Terraform Output: ${tfOutput}"  // Log the output to check it
                     try {
                         def outputs = readJSON(text: tfOutput)
                         env.EC2_IP = outputs.instance_public_ip.value
