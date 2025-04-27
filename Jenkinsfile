@@ -69,9 +69,12 @@ pipeline {
 
                         // Define path for Windows system and escape backslashes
                         def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
-
-                        // Set the correct permissions for the SSH key (if needed)
-                        
+                        bat """
+                            powershell -Command "icacls '${sshKeyPath}' /inheritance:r"
+                            powershell -Command "icacls '${sshKeyPath}' /remove 'NT AUTHORITY\\Authenticated Users'"
+                            powershell -Command "icacls '${sshKeyPath}' /grant:r '$($env:USERNAME):(R)'"
+                            powershell -Command "icacls '${sshKeyPath}' /remove 'BUILTIN\\Users'"
+                        """
 
                         // Copy deploy script to EC2 instance
                         echo "Copying files to EC2 instance"
