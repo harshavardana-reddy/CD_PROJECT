@@ -50,6 +50,14 @@ pipeline {
                 }
             }
         }
+
+        stage("Wait for EC2 to reboot"){
+            steps{
+                script{
+                    sleep(time: 120, unit: 'SECONDS') // Wait 2 minutes after reboot
+                }
+            }
+        }
         
         stage('Deploy Application') {
             steps {
