@@ -73,7 +73,8 @@ pipeline {
                         bat """
                             scp -i cd_project.pem -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
                             ssh -i cd_project.pem ec2-user@${env.EC2_IP} "ls -l /home/ec2-user/deploy-app.sh"
-                            ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
+                            ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh"
+                            ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "/home/ec2-user/deploy-app.sh"
                         """
 
                        
