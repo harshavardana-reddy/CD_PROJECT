@@ -1,8 +1,8 @@
-const backendApi = import.meta.env.VITE_APP_BACKEND_URL
+const backendApi = "localhost"
 const BackendURL = {
-    Main:`${backendApi}`,
-    Admin:`${backendApi}/admin`,
-    Seller:`${backendApi}/seller`,
-    User:`${backendApi}/user`,
+    Main:`http://${backendApi}:5000`,
+    Admin:`http://${backendApi}:5000/admin`,
+    Seller:`http://${backendApi}:5000/seller`,
+    User:`http://${backendApi}:5000/user`,
 }
 export default BackendURL;

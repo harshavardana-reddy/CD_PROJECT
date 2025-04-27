@@ -12,18 +12,18 @@ else
   cd $TARGET_DIR
 fi
 
-# Replace backend service URL with EC2 IP
+# Replace backendApi in backendURL.jsx with EC2 IP
 if [ -z "$EC2_IP" ]; then
   echo "EC2_IP variable is not set. Exiting."
   exit 1
 fi
 
-# Update docker-compose.yaml with the EC2 IP
-sed -i "s/backend:5000/${EC2_IP}:5000/g" $TARGET_DIR/docker-compose.yaml
+# Update backendApi in backendURL.jsx
+sed -i "s|const backendApi = \"localhost\"|const backendApi = \"${EC2_IP}\"|g" $TARGET_DIR/frontendapp/src/backendURL.jsx
 
 # Optionally, you can verify the replacement was successful
-echo "Updated docker-compose.yaml with backend IP: $EC2_IP"
-cat $TARGET_DIR/docker-compose.yaml
+echo "Updated backendApi in backendURL.jsx to: $EC2_IP"
+cat $TARGET_DIR/frontendapp/src/backendURL.jsx
 
 # Build and run containers
 docker-compose down
