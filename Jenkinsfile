@@ -9,7 +9,6 @@ pipeline {
         RAZORPAY_KEY_SECRET = credentials('RAZORPAY_KEY_SECRET')
         VITE_APP_RAZORPAY_KEY = credentials('VITE_APP_RAZORPAY_KEY')
         aws_credential = credentials('AWS-TERRAFORM')
-
     }
     
     stages {
@@ -36,6 +35,15 @@ pipeline {
             }
         }
         
+        stage('Wait for EC2 Instance to be Ready') {
+            steps {
+                script {
+                    echo "Waiting 30 seconds for EC2 instance to be created..."
+                    sleep(time: 30, unit: 'SECONDS')
+                }
+            }
+        }
+
         stage('Get EC2 IP') {
             steps {
                 script {
@@ -54,8 +62,6 @@ pipeline {
             }
         }
 
-
-        
         stage('Deploy Application') {
             steps {
                 sshagent(['ec2-ssh-key']) {
