@@ -54,7 +54,7 @@ pipeline {
         stage("Wait for EC2 to reboot"){
             steps{
                 script{
-                    sleep(time: 120, unit: 'SECONDS') // Wait 2 minutes after reboot
+                    sleep(time: 180, unit: 'SECONDS') // Wait 2 minutes after reboot
                 }
             }
         }
