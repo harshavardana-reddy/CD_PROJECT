@@ -67,6 +67,7 @@ pipeline {
                         // Define paths - using normalized Windows paths
                         def sshKeyPath = 'C:\\ProgramData\\Jenkins\\.ssh\\cd_project.pem'
                         bat 'powershell.exe Copy-Item "C:\\ProgramData\\Jenkins\\.ssh\\cd_project.pem" ".\\cd_project.pem"'
+                        bat 'powershell.exe icacls ".\\cd_project.pem" /inheritance:r /grant:r SYSTEM:R'
 
                         // Rest of your deployment steps...
                         bat """
