@@ -72,7 +72,7 @@ pipeline {
                         bat """
                             powershell -Command "icacls '${sshKeyPath}' /inheritance:r"
                             powershell -Command "icacls '${sshKeyPath}' /remove 'NT AUTHORITY\\Authenticated Users'"
-                            powershell -Command "icacls '${sshKeyPath}' /grant:r '$($env:USERNAME):(R)'"
+                            powershell -Command "icacls '${sshKeyPath}' /grant:r '\$($env:USERNAME):(R)'"
                             powershell -Command "icacls '${sshKeyPath}' /remove 'BUILTIN\\Users'"
                         """
 
