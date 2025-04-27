@@ -38,7 +38,7 @@ pipeline {
         stage('Get EC2 IP') {
             steps {
                 script {
-                    def tfOutput = sh(script: 'terraform output -json', returnStdout: true)
+                    def tfOutput = bat(script: 'terraform output -json', returnStdout: true)
                     def outputs = readJSON text: tfOutput
                     env.EC2_IP = outputs.instance_public_ip.value
                 }
