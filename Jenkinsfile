@@ -62,17 +62,28 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 echo "Deploying to EC2 instance at ${env.EC2_IP}"
-                echo "Using SSH key: ${env.SSH_KEY}"
-                script{
-                    try{
+                echo "Using SSH key located at D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem"
+                script {
+                    try {
                         echo "Starting Connection"
-                        sshagent(['EC2-SSH-KEY']) {
-                            echo "Connected to EC2 instance"
-                            echo "Copying files to EC2 instance"
-                            bat "ssh -v -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'echo SSH Connected Successfully!'"
-                            bat "scp -o StrictHostKeyChecking=no ./scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
-                            bat "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
-                        }
+
+                        // Define path for Windows system and escape backslashes
+                        def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
+
+                        // Set the correct permissions for the SSH key (if needed)
+                        
+
+                        // Copy deploy script to EC2 instance
+                        echo "Copying files to EC2 instance"
+                        bat """
+                            scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
+                        """
+
+                        // Run deployment script on EC2 instance
+                        echo "Running deployment script on EC2 instance"
+                        bat """
+                            ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'
+                        """
                     } catch (Exception e) {
                         echo "Exception occurred: ${e.getMessage()}"
                         error "Failed to deploy application."
@@ -80,6 +91,7 @@ pipeline {
                 }
             }
         }
+
     }
     
     post {
