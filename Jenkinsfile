@@ -22,6 +22,7 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
+                    bat 'terraform destroy'
                     bat 'terraform init'
                 }
             }
@@ -39,12 +40,13 @@ pipeline {
             steps {
                 script {
                     def tfOutput = bat(script: 'terraform output -json', returnStdout: true)
-                    def outputs = readJSON text: tfOutput
+                    def outputs = readJSON(text: tfOutput)  // This will parse the JSON output
                     env.EC2_IP = outputs.instance_public_ip.value
                 }
                 echo "EC2 Instance IP: ${env.EC2_IP}"
             }
         }
+
         
         stage('Deploy Application') {
             steps {
@@ -59,6 +61,11 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed'
+        }
+
+        failure{
+            bat 'terraform destroy'
+            echo 'Pipeline failed, destroying infrastructure'
         }
     }
 }
