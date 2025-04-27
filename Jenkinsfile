@@ -78,7 +78,6 @@ pipeline {
                             ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "bash /home/ec2-user/deploy-app.sh"
                         """
 
-                       
                         
                     } catch (Exception e) {
                         echo "Exception occurred: ${e.getMessage()}"
@@ -95,6 +94,11 @@ pipeline {
         always {
             echo 'Pipeline completed'
             bat 'del cd_project.pem'
+        }
+        
+        success {
+            echo 'Pipeline succeeded'
+            echo "Application deployed successfully to EC2 instance at ${env.EC2_IP}"
         }
 
         failure {
