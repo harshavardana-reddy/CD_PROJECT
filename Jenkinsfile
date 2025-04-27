@@ -35,7 +35,7 @@ pipeline {
                         
                         // Get Terraform output
                         def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
-                        
+                         tfOutput = tfOutput.replaceFirst(/^.*?\{/, '{')  // Remove command prompt prefix
                         // Log the output to check it
                         echo "Terraform Output: ${tfOutput}"
                         
