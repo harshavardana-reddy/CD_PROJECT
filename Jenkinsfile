@@ -54,7 +54,7 @@ pipeline {
         stage("Wait for EC2 to reboot"){
             steps{
                 script{
-                    sleep(time: 180, unit: 'SECONDS') // Wait 2 minutes after reboot
+                    sleep(time: 240, unit: 'SECONDS') // Wait 2 minutes after reboot
                 }
             }
         }
@@ -65,6 +65,7 @@ pipeline {
                 echo "Using SSH key: ${env.SSH_KEY}"
                 script{
                     try{
+                        echo "Starting Connection"
                     sshagent(credentials:['EC2-SSH-KEY']) {
                         echo "Connected to EC2 instance"
                         echo "Copying files to EC2 instance"
