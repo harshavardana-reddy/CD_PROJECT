@@ -70,10 +70,10 @@ pipeline {
                         
                         // Set permissions using icacls
                         bat """
+                            icacls "${normalizedPath}" /reset
                             icacls "${normalizedPath}" /inheritance:r
-                            icacls "${normalizedPath}" /remove "NT AUTHORITY\\Authenticated Users"
-                            icacls "${normalizedPath}" /remove "BUILTIN\\Users"
-                            icacls "${normalizedPath}" /grant:r "patti:(R)"
+                            icacls "${normalizedPath}" /grant:r "HARSHA\\patti:(R)"
+                            icacls "${normalizedPath}"
                         """
                         
                         // Verify the permissions were set
