@@ -60,43 +60,39 @@ pipeline {
         }
         
        stage('Deploy Application') {
-        steps {
-            echo "Deploying to EC2 instance at ${env.EC2_IP}"
-            script {
-                try {
-                    // Define paths - using normalized Windows paths
-                    def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
-                    def normalizedPath = sshKeyPath.replace('\\', '\\\\')
-                    
-                    // Get the actual username of the account running Jenkins
-                    def jenkinsUser = bat(script: 'echo %USERNAME%', returnStdout: true).trim()
-                    
-                    echo "Setting permissions for SSH key using account: ${jenkinsUser}"
-                    
-                    // Set permissions using icacls
-                    bat """
-                        icacls "${normalizedPath}" /inheritance:r
-                        icacls "${normalizedPath}" /remove "NT AUTHORITY\\Authenticated Users"
-                        icacls "${normalizedPath}" /grant:r "patti:(R)"
-                        icacls "${normalizedPath}" /remove "BUILTIN\\Users"
-                    """
+            steps {
+                echo "Deploying to EC2 instance at ${env.EC2_IP}"
+                script {
+                    try {
+                        // Define paths - using normalized Windows paths
+                        def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
+                        def normalizedPath = sshKeyPath.replace('\\', '\\\\')
+                        
+                        // Set permissions using icacls
+                        bat """
+                            icacls "${normalizedPath}" /inheritance:r
+                            icacls "${normalizedPath}" /remove "NT AUTHORITY\\Authenticated Users"
+                            icacls "${normalizedPath}" /remove "BUILTIN\\Users"
+                            icacls "${normalizedPath}" /grant:r "patti:(R)"
+                        """
+                        
+                        // Verify the permissions were set
+                        bat "icacls \"${normalizedPath}\""
 
-                    // Verify the permissions were set
-                    bat "icacls \"${normalizedPath}\""
-
-                    // Rest of your deployment steps...
-                    bat """
-                        scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
-                        ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
-                    """
-
-                } catch (Exception e) {
-                    echo "Exception occurred: ${e.getMessage()}"
-                    error "Failed to deploy application. See logs for details."
+                        // Rest of your deployment steps...
+                        bat """
+                            scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
+                            ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
+                        """
+                        
+                    } catch (Exception e) {
+                        echo "Exception occurred: ${e.getMessage()}"
+                        error "Failed to deploy application. See logs for details."
+                    }
                 }
             }
-        }
-    }
+}
+
 
     }
     
