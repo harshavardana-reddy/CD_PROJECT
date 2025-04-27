@@ -72,7 +72,9 @@ pipeline {
         }
 
         failure{
-            bat 'terraform destroy -auto-approve'
+            dir('terraform') {
+                bat 'terraform destroy -auto-approve'
+            }
             echo 'Pipeline failed, destroying infrastructure'
         }
     }
