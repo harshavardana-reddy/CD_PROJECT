@@ -12,6 +12,19 @@ else
   cd $TARGET_DIR
 fi
 
+# Replace backend service URL with EC2 IP
+if [ -z "$EC2_IP" ]; then
+  echo "EC2_IP variable is not set. Exiting."
+  exit 1
+fi
+
+# Update docker-compose.yaml with the EC2 IP
+sed -i "s/backend:5000/${EC2_IP}:5000/g" $TARGET_DIR/docker-compose.yaml
+
+# Optionally, you can verify the replacement was successful
+echo "Updated docker-compose.yaml with backend IP: $EC2_IP"
+cat $TARGET_DIR/docker-compose.yaml
+
 # Build and run containers
 docker-compose down
 docker-compose build --no-cache

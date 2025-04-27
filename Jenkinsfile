@@ -21,7 +21,6 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 dir('terraform') {
-                    bat 'terraform destroy -auto-approve'
                     bat 'terraform init'
                 }
             }
