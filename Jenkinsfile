@@ -39,13 +39,21 @@ pipeline {
         stage('Get EC2 IP') {
             steps {
                 script {
-                    def tfOutput = bat(script: 'terraform output -json', returnStdout: true)
-                    def outputs = readJSON(text: tfOutput)  // This will parse the JSON output
-                    env.EC2_IP = outputs.instance_public_ip.value
+                    def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
+                    
+                    // Check if the output is valid JSON
+                    
+                    try {
+                        def outputs = readJSON(text: tfOutput)
+                        env.EC2_IP = outputs.instance_public_ip.value
+                    } catch (Exception e) {
+                        error "Invalid JSON output: ${e.getMessage()}"
+                    }
                 }
                 echo "EC2 Instance IP: ${env.EC2_IP}"
             }
         }
+
 
         
         stage('Deploy Application') {
@@ -64,7 +72,7 @@ pipeline {
         }
 
         failure{
-            bat 'terraform destroy'
+            bat 'terraform destroy -auto-approve'
             echo 'Pipeline failed, destroying infrastructure'
         }
     }
