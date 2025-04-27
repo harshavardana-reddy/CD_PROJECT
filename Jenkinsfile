@@ -66,15 +66,15 @@ pipeline {
                 script{
                     try{
                         echo "Starting Connection"
-                    sshagent(credentials:['EC2-SSH-KEY']) {
-                        echo "Connected to EC2 instance"
-                        echo "Copying files to EC2 instance"
-                        sh "scp -o StrictHostKeyChecking=no ./scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
-                        sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
-                    }
+                        sshagent(['EC2-SSH-KEY']) {
+                            echo "Connected to EC2 instance"
+                            echo "Copying files to EC2 instance"
+                            bat "ssh -v -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'echo SSH Connected Successfully!'"
+                            bat "scp -o StrictHostKeyChecking=no ./scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
+                            bat "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
+                        }
                     } catch (Exception e) {
-                        echo "Exception occurred: ${e.toString()}"
-                        echo "Stack Trace: ${e.getStackTrace()}"
+                        echo "Exception occurred: ${e.getMessage()}"
                         error "Failed to deploy application."
                     }
                 }
