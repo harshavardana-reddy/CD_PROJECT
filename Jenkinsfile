@@ -72,8 +72,11 @@ pipeline {
                         // Rest of your deployment steps...
                         bat """
                             scp -i cd_project.pem -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
+                            ssh -i cd_project.pem ec2-user@${env.EC2_IP} "ls -l /home/ec2-user/deploy-app.sh"
                             ssh -i cd_project.pem -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
                         """
+
+                       
                         
                     } catch (Exception e) {
                         echo "Exception occurred: ${e.getMessage()}"
@@ -89,6 +92,7 @@ pipeline {
     post {
         always {
             echo 'Pipeline completed'
+            bat 'del cd_project.pem'
         }
 
         failure {
