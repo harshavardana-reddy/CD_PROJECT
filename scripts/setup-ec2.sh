@@ -20,6 +20,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 # Install Git
 sudo yum install -y git
+# Install dos2unix
+sudo yum install -y dos2unix
 
 # Install Node.js 18.x
 curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash -
