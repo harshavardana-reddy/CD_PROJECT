@@ -66,7 +66,9 @@ pipeline {
                 script{
                     try{
                     sshagent(credentials:['EC2-SSH-KEY']) {
-                        sh "scp -o StrictHostKeyChecking=no scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
+                        echo "Connected to EC2 instance"
+                        echo "Copying files to EC2 instance"
+                        sh "scp -o StrictHostKeyChecking=no ./scripts/deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/"
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'"
                     }
                     } catch (Exception e) {
