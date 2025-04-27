@@ -62,34 +62,62 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 echo "Deploying to EC2 instance at ${env.EC2_IP}"
-                echo "Using SSH key located at D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem"
                 script {
                     try {
-                        echo "Starting Connection"
+                        // Define paths - using forward slashes works on both Windows and Unix-like systems
+                        def sshKeyPath = 'D:/KLU/3RD YEAR EVEN SEM/Cloud-Devops/Project/cd_project.pem'
+                        def deployScriptPath = './scripts/deploy-app.sh'
+                        
+                        // Set proper permissions for the SSH key (Windows specific)
+                        if (isUnix()) {
+                            echo "Running on Unix-like system"
+                            sh "chmod 600 ${sshKeyPath}"
+                        } else {
+                            echo "Running on Windows system"
+                            bat """
+                                icacls "${sshKeyPath.replace('/', '\\')}" /inheritance:r
+                                icacls "${sshKeyPath.replace('/', '\\')}" /remove "NT AUTHORITY\\Authenticated Users"
+                                icacls "${sshKeyPath.replace('/', '\\')}" /grant:r "%USERNAME%:(R)"
+                                icacls "${sshKeyPath.replace('/', '\\')}" /remove "BUILTIN\\Users"
+                            """
+                        }
 
-                        // Define path for Windows system and escape backslashes
-                        def sshKeyPath = 'D:\\KLU\\3RD YEAR EVEN SEM\\Cloud-Devops\\Project\\cd_project.pem'
-                        bat """
-                            powershell -Command "icacls '${sshKeyPath}' /inheritance:r"
-                            powershell -Command "icacls '${sshKeyPath}' /remove 'NT AUTHORITY\\Authenticated Users'"
-                            powershell -Command "icacls '${sshKeyPath}' /grant:r '\$($env:USERNAME):(R)'"
-                            powershell -Command "icacls '${sshKeyPath}' /remove 'BUILTIN\\Users'"
-                        """
+                        // Verify the deploy script exists
+                        if (!fileExists(deployScriptPath)) {
+                            error "Deploy script not found at ${deployScriptPath}"
+                        }
 
                         // Copy deploy script to EC2 instance
                         echo "Copying files to EC2 instance"
-                        bat """
-                            scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no .\\scripts\\deploy-app.sh ec2-user@${env.EC2_IP}:/home/ec2-user/
-                        """
+                        
+                            if (isUnix()) {
+                                sh """
+                                    scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no ${deployScriptPath} ec2-user@${env.EC2_IP}:/home/ec2-user/
+                                """
+                            } else {
+                                bat """
+                                    scp -i "${sshKeyPath}" -o StrictHostKeyChecking=no ${deployScriptPath} ec2-user@${env.EC2_IP}:/home/ec2-user/
+                                """
+                            }
 
                         // Run deployment script on EC2 instance
                         echo "Running deployment script on EC2 instance"
-                        bat """
-                            ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} 'chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh'
-                        """
+                        if (isUnix()) {
+                            sh """
+                                ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} \
+                                    "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
+                            """
+                        } else {
+                            bat """
+                                ssh -i "${sshKeyPath}" -o StrictHostKeyChecking=no ec2-user@${env.EC2_IP} \
+                                    "chmod +x /home/ec2-user/deploy-app.sh && /home/ec2-user/deploy-app.sh"
+                            """
+                        }
+
                     } catch (Exception e) {
                         echo "Exception occurred: ${e.getMessage()}"
-                        error "Failed to deploy application."
+                        currentBuild.result = 'FAILURE'
+                        error "Failed to deploy application. See logs for details."
                     }
                 }
             }
