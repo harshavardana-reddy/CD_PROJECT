@@ -67,7 +67,7 @@ pipeline {
                         // Define paths - using forward slashes works on both Windows and Unix-like systems
                         def sshKeyPath = 'D:/KLU/3RD YEAR EVEN SEM/Cloud-Devops/Project/cd_project.pem'
                         def deployScriptPath = './scripts/deploy-app.sh'
-                        def jenkinsUser = bat(script: '$env:USERNAME', returnStdout: true).trim()
+                        def jenkinsUser = bat(script: 'echo %USERNAME%', returnStdout: true).trim()
                         
                         // Set proper permissions for the SSH key (Windows specific)
                         if (isUnix()) {
