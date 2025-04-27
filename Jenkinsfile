@@ -47,11 +47,14 @@ pipeline {
         stage('Get EC2 IP') {
             steps {
                 script {
-                    def tfOutput = bat(script: 'terraform output -json', returnStdout: true).trim()
-                    
-                    // Check if the output is valid JSON
-                    echo "Terraform Output: ${tfOutput}"  // Log the output to check it
+                    // Directly run the terraform output command using bat
+                    def tfOutput = bat returnStdout: true, script: 'terraform output -json'
+
+                    // Log the output to check it
+                    echo "Terraform Output: ${tfOutput}"
+
                     try {
+                        // Parse the JSON output
                         def outputs = readJSON(text: tfOutput)
                         env.EC2_IP = outputs.instance_public_ip.value
                     } catch (Exception e) {
@@ -61,6 +64,7 @@ pipeline {
                 echo "EC2 Instance IP: ${env.EC2_IP}"
             }
         }
+
 
         stage('Deploy Application') {
             steps {
