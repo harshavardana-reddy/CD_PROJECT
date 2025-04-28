@@ -60,7 +60,7 @@ pipeline {
         
        stage('Deploy Application') {
             steps {
-                echo "Deploying to EC2 instance at ${env.EC2_IP}"
+                echo "Deploying to EC2 instance at http://${env.EC2_IP}"
                 script {
                     try {
                         // Define paths - using normalized Windows paths
