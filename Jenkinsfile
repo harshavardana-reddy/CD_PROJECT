@@ -98,6 +98,37 @@ pipeline {
         success {
             echo 'Pipeline succeeded'
             echo "Application deployed successfully to EC2 instance at ${env.EC2_IP}"
+            emailext (
+                subject: "✅ CD Pipeline Success - Application Deployed",
+                body: """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+                    <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px;">
+                        <h2 style="color: #4CAF50;">🚀 Deployment Successful!</h2>
+                        <p>Hello Team,</p>
+                        <p>The continuous deployment pipeline has successfully deployed the application to the EC2 instance.</p>
+                        <table style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><strong>EC2 IP:</strong></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><a href="http://${env.EC2_IP}:3000" >${env.EC2_IP}</a></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Status:</strong></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Success ✅</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Repository:</strong></td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">CD_PROJECT</td>
+                            </tr>
+                        </table>
+                        <p style="margin-top: 20px;">Regards,<br><strong>Jenkins CI/CD</strong></p>
+                    </div>
+                </body>
+                </html>
+                """,
+                mimeType: 'text/html',
+                to: '2200030963@kluniversity.in'
+            )
         }
 
         failure {
