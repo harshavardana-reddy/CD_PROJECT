@@ -19,7 +19,7 @@ if [ -z "$EC2_IP" ]; then
 fi
 
 # Update backendApi in backendURL.jsx
-sed -i "s|const backendApi = \"localhost\"|const backendApi = \"${EC2_IP}\"|g" $TARGET_DIR/frontendapp/src/BackendURL.jsx
+sed -i "s|const backendApi = \".*\"|const backendApi = \"${EC2_IP}\"|g" $TARGET_DIR/frontendapp/src/BackendURL.jsx
 
 # Optionally, you can verify the replacement was successful
 echo "Updated backendApi in BackendURL.jsx to: $EC2_IP"
