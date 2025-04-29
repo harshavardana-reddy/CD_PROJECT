@@ -93,6 +93,8 @@ pipeline {
         always {
             echo 'Pipeline completed'
             bat 'del cd_project.pem'
+            bat 'terraform destroy -auto-approve'
+            cleanWs()
         }
         
         success {
